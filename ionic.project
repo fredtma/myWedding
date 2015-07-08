@@ -1,0 +1,13 @@
+{
+  "name": "Encentivize User Management System",
+  "app_id": "3b9e7946",
+  "gulpStartupTasks": [
+    "sass",
+    "watch"
+  ],
+  "watchPatterns": [
+    "scss/ionic.app.scss",
+    "www/**/*",
+    "!www/lib/**/*"
+  ]
+}

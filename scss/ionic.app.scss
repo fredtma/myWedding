@@ -1,0 +1,83 @@
+/*
+To customize the look and feel of Ionic, you can override the variables
+in ionic's _variables.scss file.
+
+For example, you might change some of the default colors:
+*/
+$light:                           #fff !default;
+$stable:                          #f8f8f8 !default;
+$positive:                        #387ef5 !default;
+$calm:                            #11c1f3 !default;
+$balanced:                        #199b79 !default;//#33cd5f
+$energized:                       #ffc900 !default;
+$assertive:                       #ef473a !default;
+$royal:                           #886aea !default;
+$dark:                            #000 !default;
+
+$border-radius-base:        0px;
+$border-radius-large:       0px;
+$border-radius-small:       0px;
+$button-border-radius:      0px;
+$card-border-radius:        0px;
+$popover-border-radius:     0px;
+$popover-border-radius-ios: 0px;
+$sheet-border-radius:       0px;
+$popup-border-radius:       0px;
+// The path for our ionicons font files, relative to the built CSS in www/css
+$ionicons-font-path: "../lib/ionic/fonts" !default;
+
+// Include all of Ionic
+@import "www/lib/ionic/scss/ionic";
+//===================================================================//
+//MODIFIED
+//===================================================================//
+.dashboard {
+  .row{
+    height: 220px;
+    padding:5px 0px;
+  }
+}
+.padding {
+  .card {
+    margin: 5px;
+  }
+}
+
+.card {
+  height:200px;
+  cursor: pointer;
+  .item, .item-divider {
+    padding: 5px;
+  }
+  &.col {
+    padding: 0px;
+  }
+  .item {
+    font-size: 99%;
+    .badge {
+      top: 4px;
+      right: 8px;
+    }
+  }
+  .icon {
+    font-size: 150%;
+  }
+  .item-icon-left{
+    padding-left:60px;
+    height:40px;
+  }
+  .item-toggle .toggle {
+    top:3px;
+  }
+}
+.list-sub{
+  a.item-content{
+    padding: 9px;
+    border-left:3px solid $balanced;
+  }
+}
+//===================================================================//
+//MY CLASS
+//===================================================================//
+.click{cursor:pointer;}
+

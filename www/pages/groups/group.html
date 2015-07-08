@@ -1,0 +1,33 @@
+<ion-view view-title="{{chat.name}}">
+    <ion-content>
+        <form name="dataForm" id="dataForm">
+            <div class="list">
+                <div class="item item-icon-left item-divider item-button-right item-balanced">
+                    <i class="icon {{model.icon}}"></i>
+                    Group Details
+                    <button class="button button-clear" onclick="document.getElementById('upload').click()" style="color:#fff;top:2px;" title="Upload file">
+                        <i class="icon ion-ios-cloud-upload"></i>
+                    </button>
+                </div>
+                <input id="upload" name="upload" type="file" onchange="angular.element(this).scope().module.getUpload(event,'upload',null)" multiple="false" class="hide" />
+                <label class="item item-input">
+                    <span class="input-label">Group Name</span>
+                        <input required type="text" placeholder="Group's Name" ng-model="model.name" name="name" autocomplete="name" ng-model-options="{ updateOn: 'blur' }" />
+                </label>
+                <label class="item item-input">
+                    <span class="input-label">Description</span>
+                    <input required type="text" placeholder="Group description" ng-model="model.description" name="description"   />
+                </label>
+            </div>
+            <ion-list class="list list-sub" type="inset">
+                <ion-item class="item item-divider item-balanced">
+                    User's in <span ng-bind="model.name"></span>'s list
+                </ion-item>
+                <ion-item class="item item-icon-right" ng-repeat="child in model.children"  type="item-text-wrap" href="#/tab/group/{{model.id}}">
+                    <span ng-bind="child"></span>
+                    <i class="icon ion-chevron-right icon-accessory" title="Edit"></i>
+                </ion-item>
+            </ion-list>
+        </form>
+    </ion-content>
+</ion-view>

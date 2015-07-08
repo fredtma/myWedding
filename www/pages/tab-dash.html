@@ -1,0 +1,48 @@
+<ion-view view-title="Dashboard">
+  <ion-content class="dashboard">
+    <div class="row">
+        <div class="list card col col-50">
+            <div class="item item-divider item-balanced "><i class="icon ion-ios-people"></i> Recent Group</div>
+            <div class="item item-body">
+                <ul class="list">
+                    <li class="item" ng-repeat="group in model.groups|limitTo:3"><span ng-bind="group.name"></span> <i class="badge" ng-bind="group.children.length"></i></li>
+                    <li class="item">...</li>
+                    <li class="item">Total <i class="badge badge-dark">22</i></li>
+                </ul>
+            </div>
+        </div>
+        <div class="list card col col-50">
+            <div class="item item-divider item-balanced "><i class="icon ion-ios-email"></i> Notice</div>
+            <div class="item item-body">
+                <div>
+                    No notification!
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="list card col col-50">
+            <div class="item item-divider item-balanced "><i class="icon ion-ios-gear"></i> Settings</div>
+            <ion-toggle  ng-model="settings.offline" class="item item-icon-left">
+                <i class="icon ion-social-rss-outline"></i>
+                Enable Offline
+            </ion-toggle>
+
+            <ion-toggle  ng-model="settings.gps" class="item item-icon-left">
+                <i class="icon ion-ios-location-outline"></i>
+                GPS Location
+            </ion-toggle>
+
+            <ion-toggle  ng-model="settings.notification" class="item item-icon-left">
+                <i class="icon ion-ios-chatboxes-outline"></i>
+                Push Notification
+            </ion-toggle>
+
+            <ion-toggle  ng-model="settings.filesystem" class="item item-icon-left">
+                <i class="icon ion-ios-folder-outline"></i>
+                Use Filesystem
+            </ion-toggle>
+        </div>
+    </div>
+  </ion-content>
+</ion-view>
