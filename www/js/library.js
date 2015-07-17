@@ -581,7 +581,9 @@ function issets(obj,path){
 //============================================================================//
 function GPLUS_USER() {
     // @corecode_begin getProtectedData
-    this.access_token, this.user_info,this.callFunction;//public
+    // this.access_token; 
+    // this.user_info; 
+    // this.callFunction;//public
     var callback,retry,that=this;//private
     this.getToken = function(method, url, interactive, callBack) {
         retry = false;
