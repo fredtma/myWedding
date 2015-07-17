@@ -31,3 +31,4 @@ build/Release
 # https://www.npmjs.org/doc/misc/npm-faq.html#should-i-check-my-node_modules-folder-into-git
 node_modules
 >>>>>>> 02fa25965740ee2ed6896104b15f510679162b8f
+/.gitignore.orig
