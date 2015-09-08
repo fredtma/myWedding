@@ -1,7 +1,7 @@
 <ion-view view-title="Groups">
     <ion-content>
         <ion-list>
-            <ion-item class="item-remove-animate item item-icon-left item-icon-right" ng-repeat="model in models" type="item-text-wrap" href="#/tab/group/{{model.id}}">
+            <ion-item class="item-remove-animate item item-icon-left item-icon-right" ng-repeat="model in models" type="item-text-wrap" href="#/tab/group/{{model.$id}}">
                 <i class="icon {{model.icon}}"></i>
                 <h2>{{model.name}}</h2>
                 <p>{{model.description}}</p>

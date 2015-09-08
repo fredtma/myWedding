@@ -32,3 +32,5 @@ build/Release
 node_modules
 >>>>>>> 02fa25965740ee2ed6896104b15f510679162b8f
 /.gitignore.orig
+/nbproject/
+/nbproject/private/

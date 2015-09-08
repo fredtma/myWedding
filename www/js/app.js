@@ -1,5 +1,5 @@
 'use strict'
-angular.module('userManager', ['ionic', 'userManager.controllers', 'userManager.services', 'ionic.service.core'])
+angular.module('userManager', ['ionic', 'userManager.controllers', 'userManager.services', 'ionic.service.core', 'mondeEntier', 'firebase'])
 .run(runFunction)
 .config(configFunction);
 

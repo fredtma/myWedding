@@ -14,14 +14,18 @@ function dashCtrl($scope, serveGroup) {
 groupCtrl.$inject=['$scope','$stateParams', 'serveGroup'];
 function groupCtrl($scope, $stateParams, serveGroup) {
     $scope.module= {};
-    $scope.model = serveGroup.get($stateParams.Id);
+    serveGroup.get($stateParams.Id).then(function(response){
+        $scope.model = response;
+    });
     $scope.module.getUpload = function(){};
 }
 
-groupsCtrl.$inject=['$scope','serveGroup'];
-function groupsCtrl($scope, serveGroup) {
+groupsCtrl.$inject=['$scope', 'serveGroup', 'fireDB'];
+function groupsCtrl($scope, serveGroup, fireDB) {
     //$scope.$on('$ionicView.enter', function(e) {});
-    $scope.models = serveGroup.all();
+    serveGroup.all.then(function(response){
+        $scope.models = response;
+    });
     $scope.remove = function(id) {serveGroup.remove(id);}
 }
 

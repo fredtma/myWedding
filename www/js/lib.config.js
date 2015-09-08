@@ -7,22 +7,22 @@ configuration.prototype.config=function(){
     var site,api,dt = new Date().getTime();
     var caecus = {};//hiden configfile
 
-    sessionStorage.DATE_FORMAT  ='fullDate';
-    sessionStorage.SITE_API     =sessionStorage.SITE_URL;
-    sessionStorage.SITE_AURA    ='ales';
-    sessionStorage.SITE_JSON    =sessionStorage.SITE_URL + 'json/caecus-birdChecklist.json';
+    sessionStorage.DATE_FORMAT  = 'fullDate';
+    sessionStorage.SITE_API     = sessionStorage.SITE_URL;
+    sessionStorage.SITE_AURA    = 'ales';
+    sessionStorage.SITE_JSON    = sessionStorage.SITE_URL + 'json/caecus-birdChecklist.json';
     sessionStorage.SITE_ONLINE  = (1)? sessionStorage.SITE_ONLINE: false;//the first time it will be empty and set in the function checkConnection.
-    sessionStorage.SITE_MAIL    ='support@demo.co.za';
-    sessionStorage.SITE_NAME    ="Name of Site";
-    sessionStorage.SITE_URL     ='http://localhost:1336/aura/';
-    sessionStorage.RUN_TIME     =dt;
-    sessionStorage.START_TIME   =dt;
-    sessionStorage.TIME_FORMAT  ='mediumTime';
-    sessionStorage.DB_NAME      ='dbName';
-    sessionStorage.DB_VERSION   =1;//always use integer bcos of iDB
-    sessionStorage.DB_DESC      ='The local application Database';
-    sessionStorage.DB_SIZE      =15;
-    sessionStorage.DB_LIMIT     =20;
+    sessionStorage.SITE_MAIL    = 'support@demo.co.za';
+    sessionStorage.SITE_NAME    = "Name of Site";
+    sessionStorage.SITE_URL     = window.location.origin || 'http://localhost:1336/aura';
+    sessionStorage.RUN_TIME     = dt;
+    sessionStorage.START_TIME   = dt;
+    sessionStorage.TIME_FORMAT  = 'mediumTime';
+    sessionStorage.DB_NAME      = 'dbName';
+    sessionStorage.DB_VERSION   = 1;//always use integer bcos of iDB
+    sessionStorage.DB_DESC      = 'The local application Database';
+    sessionStorage.DB_SIZE      = 15;
+    sessionStorage.DB_LIMIT     = 20;
 
     api = {
         "indexedDB":      "indexedDB" in window||"webkitIndexedDB" in window||"mozIndexedDB" in window||"msIndexedDB" in window,
@@ -42,7 +42,7 @@ configuration.prototype.config=function(){
     dynamis.set('api',api);
     if(!localStorage.eternal){dynamis.set("eternal",caecus,true)}
     else{//get from online for the latest file
-        iyona.sync({"url":sessionStorage.SITE_API,"method":"get","format":"json","callback":function(data){
+        iyona.sync({"url":sessionStorage.SITE_API+"/files/schema.json","method":"get","format":"json","callback":function(data){
             iyona.on("eternalScope::",data);
             dynamis.set("eternal",data,true);
         }});
@@ -160,34 +160,41 @@ var iyona={
     /**
      * {method,format,url,params,callback}
      */
-    sync: function(settings){
-        var defaults={"method":"post","format":"json","url":sessionStorage.SITE_SERVICE};
-        for (var key in defaults) { settings[key] = settings[key]||defaults[key];}
+    sync: function(settings){//settings: {url, withCredentials, format, method, params, callback}
+        var defaults={"method":"post", "format":"json", "url":sessionStorage.SITE_API, withCredentials:true};
+        for (var key in defaults) { settings[key] = isset(settings[key])? settings[key]: defaults[key];}
         var xhr=new XMLHttpRequest(),params;
 
         xhr.open(settings.method,settings.url,true);
-        xhr.withCredentials=true;
-        xhr.responseType=settings.format;
-        xhr.onreadystatechange=function(e){iyona.off("Begining...",this.readyState,this.status,this.response,settings);
+        xhr.withCredentials     = settings.withCredentials;
+        xhr.responseType        = settings.format;
+        xhr.onreadystatechange  = readyStateChange;
+
+        if(typeof settings.params==="object"){
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            params=JSON.stringify(settings.params);
+        }else{
+            params=settings.params;
+            xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        };
+        if(settings.format==="json"){
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");//questionable, to be removed?
+            xhr.setRequestHeader("Accept","text/html,application/xhtml+xml,application/xml;application/json;q=0.9,*/*;q=0.8");//used in FF
+        }
+        xhr.onerror=function(e){
+            console.info("Check internet connection");
+            console.error('ERROR:: ',e);
+        };
+        xhr.send(params);
+
+        function readyStateChange(e){
             if(this.readyState===4 && this.status===200){
                 var response=this.response||"{}";//@fix:empty object so as to not cause an error
                 if(typeof response==="string"&&settings.format==="json" )response=JSON.parse(response);//wen setting responseType to json does not work
                 //else response=JSON.parse(response); //@change: if object is not a string, changes are that it is an object already
                 if(typeof settings.callback==="function")settings.callback(response);
             }
-        }//xhr.onload=function(e){iyona.on("III",e,this.readyState,this.status,this.response);};
-
-        if(typeof settings.params==="object"){
-            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");params=JSON.stringify(settings.params);
-        }else{
-            params=settings.params;xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-        };
-        if(settings.format==="json"||true){
-            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");//questionable, to be removed?
-            xhr.setRequestHeader("Accept","text/html,application/xhtml+xml,application/xml;application/json;q=0.9,*/*;q=0.8");//used in FF
         }
-        xhr.onerror=function(e){iyona.msg("Check internet connection");iyona.on('ERROR:: ',e);};
-        xhr.send(params);
     },
     /**
      * stack for chrome, to display the last position of the script where it was executed last
@@ -201,7 +208,7 @@ var iyona={
         else{return '';}
     }
 };
-var myLog = iyona;
+var mylog = iyona;
 //============================================================================//STORAGE
 /*
  * used to store to storage to json objects
@@ -259,3 +266,4 @@ var _$=function(element){
     else return angular.element(element);
 };
 //============================================================================//
+//https://spreadsheets.google.com/feeds/cells/1JfaPSPOd7eBgZNI4-d42ZjCeljzjk3s1GH7eze72fbc/od6/public/values?alt=json
