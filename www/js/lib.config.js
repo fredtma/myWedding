@@ -4,25 +4,28 @@
 //============================================================================//
 function configuration(){}
 configuration.prototype.config=function(){
-    var site,api,dt = new Date().getTime();
-    var caecus = {};//hiden configfile
-
-    sessionStorage.DATE_FORMAT  = 'fullDate';
-    sessionStorage.SITE_API     = sessionStorage.SITE_URL;
-    sessionStorage.SITE_AURA    = 'ales';
-    sessionStorage.SITE_JSON    = sessionStorage.SITE_URL + 'json/caecus-birdChecklist.json';
-    sessionStorage.SITE_ONLINE  = (1)? sessionStorage.SITE_ONLINE: false;//the first time it will be empty and set in the function checkConnection.
-    sessionStorage.SITE_MAIL    = 'support@demo.co.za';
-    sessionStorage.SITE_NAME    = "Name of Site";
-    sessionStorage.SITE_URL     = window.location.origin || 'http://localhost:1336/aura';
-    sessionStorage.RUN_TIME     = dt;
-    sessionStorage.START_TIME   = dt;
-    sessionStorage.TIME_FORMAT  = 'mediumTime';
-    sessionStorage.DB_NAME      = 'dbName';
-    sessionStorage.DB_VERSION   = 1;//always use integer bcos of iDB
-    sessionStorage.DB_DESC      = 'The local application Database';
-    sessionStorage.DB_SIZE      = 15;
-    sessionStorage.DB_LIMIT     = 20;
+    var site,api;
+    var dt      = new Date().getTime();
+    var caecus  = {};//hiden configfile
+    var site    = {
+      formatDate: 'fullDate',
+      url:        window.location.origin || 'http://localhost:1336/aura',
+      port:       window.location.port,
+      api:        window.location.origin+"/www/",
+      aura:       'ales',
+      json:       this.url + 'json/caecus-birdChecklist.json',
+      mail:       'support@demo.co.za',
+      name:       "config",
+      run:        dt,
+      start:      dt,
+      formatTime: 'mediumTime',
+      dbName:     'dbName',
+      dbVersion:  1,
+      dbDesc:     'The local application Database',
+      dbSize:     15,
+      dbLimit:    20
+    };
+    dynamis.set('site',site);
 
     api = {
         "indexedDB":      "indexedDB" in window||"webkitIndexedDB" in window||"mozIndexedDB" in window||"msIndexedDB" in window,
@@ -37,16 +40,9 @@ configuration.prototype.config=function(){
         "projectID":      "17238315752",
         "chromeApp":      (typeof chrome !== "undefined" && typeof chrome.app.window!=="undefined")
     };
-    api.Worker    = (1)? api.Worker: false;//disable worker
-
+    api.Worker = (1)? api.Worker: false;//disable worker
     dynamis.set('api',api);
-    if(!localStorage.eternal){dynamis.set("eternal",caecus,true)}
-    else{//get from online for the latest file
-        iyona.sync({"url":sessionStorage.SITE_API+"/files/schema.json","method":"get","format":"json","callback":function(data){
-            iyona.on("eternalScope::",data);
-            dynamis.set("eternal",data,true);
-        }});
-    }
+
     dynamis.set("pattern",{
         "username":["^[A-Za-z0-9_]{6,15}$","requires at least six alpha-numerique character"],
         "pass1":["((?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{6,20})","requires upperCase, lowerCase, number and a minimum of 6 chars"],
@@ -160,41 +156,56 @@ var iyona={
     /**
      * {method,format,url,params,callback}
      */
-    sync: function(settings){//settings: {url, withCredentials, format, method, params, callback}
-        var defaults={"method":"post", "format":"json", "url":sessionStorage.SITE_API, withCredentials:true};
-        for (var key in defaults) { settings[key] = isset(settings[key])? settings[key]: defaults[key];}
-        var xhr=new XMLHttpRequest(),params;
+    sync: function(url, data, callback, options){//settings: {url, withCredentials, format, method, params, callback}
+      var settings = {};
 
-        xhr.open(settings.method,settings.url,true);
-        xhr.withCredentials     = settings.withCredentials;
-        xhr.responseType        = settings.format;
-        xhr.onreadystatechange  = readyStateChange;
+      if (typeof url === "string") settings.url = url;
 
-        if(typeof settings.params==="object"){
-            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-            params=JSON.stringify(settings.params);
-        }else{
-            params=settings.params;
-            xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-        };
-        if(settings.format==="json"){
-            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");//questionable, to be removed?
-            xhr.setRequestHeader("Accept","text/html,application/xhtml+xml,application/xml;application/json;q=0.9,*/*;q=0.8");//used in FF
-        }
-        xhr.onerror=function(e){
-            console.info("Check internet connection");
-            console.error('ERROR:: ',e);
-        };
-        xhr.send(params);
+      if(arguments.length ===1 && typeof url ==="object") settings = url;
+      if(arguments.length>1 && typeof arguments[1]==="object" && arguments[1].params) settings = arguments[1];
+      if(arguments.length>2 && typeof arguments[2]==="object" && arguments[2].params) settings = arguments[2];
+      if(arguments.length>3 && typeof arguments[3]==="object") settings = arguments[3];
 
-        function readyStateChange(e){
-            if(this.readyState===4 && this.status===200){
-                var response=this.response||"{}";//@fix:empty object so as to not cause an error
-                if(typeof response==="string"&&settings.format==="json" )response=JSON.parse(response);//wen setting responseType to json does not work
-                //else response=JSON.parse(response); //@change: if object is not a string, changes are that it is an object already
-                if(typeof settings.callback==="function")settings.callback(response);
-            }
-        }
+      if(arguments.length>1 && typeof arguments[1]==="object" && !arguments[1].params) settings.params = arguments[1];
+      if(arguments.length>1 && typeof arguments[1]==="function") settings.callback = arguments[1];
+      if(arguments.length>2 && typeof arguments[2]==="function") settings.callback = arguments[2];
+
+
+      var defaults = {"method":"post", "format":"json", "url":"", withCredentials:true};
+      for (var key in defaults) { settings[key] = isset(settings[key])? settings[key]: defaults[key];}
+
+      var xhr=new XMLHttpRequest(),params;
+
+      xhr.open(settings.method,settings.url,true);
+      xhr.withCredentials     = settings.withCredentials;
+      xhr.responseType        = settings.format;
+      xhr.onreadystatechange  = readyStateChange;
+
+      if(typeof settings.params==="object"){
+          xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+          params=settings.params;
+      }else{
+          params=settings.params;
+          xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+      };
+      if(settings.format==="json"){
+          xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");//questionable, to be removed?
+          xhr.setRequestHeader("Accept","text/html,application/xhtml+xml,application/xml;application/json;q=0.9,*/*;q=0.8");//used in FF
+      }
+      xhr.onerror=function(e){
+          console.info("Check internet connection");
+          console.error('ERROR:: ',e);
+      };
+      xhr.send(params);
+
+      function readyStateChange(e){
+          if(this.readyState===4 && this.status===200){
+              var response=this.response||"{}";//@fix:empty object so as to not cause an error
+              if(typeof response==="string"&&settings.format==="json" )response=JSON.parse(response);//wen setting responseType to json does not work
+              //else response=JSON.parse(response); //@change: if object is not a string, changes are that it is an object already
+              if(typeof settings.callback==="function")settings.callback(response);
+          }
+      }
     },
     /**
      * stack for chrome, to display the last position of the script where it was executed last
@@ -241,16 +252,25 @@ var dynamis={
       return str2Json(value)||value;
   },
   set:function(_key,_value,_local){//chrome.app.window
-      var set={},string;
-      set[_key]=_value;
-      var isChromeApp=myPlatform.isChromeApp;
-      string=str2Json(_value);
+      var set={}, string;
+      set[_key]       = _value;
+      var isChromeApp = myPlatform.isChromeApp;
+      string          = (typeof _value==="object")? JSON.stringify(_value): str2Json(value);
 
       //if(string===false) { iyona.err("The string given is not a valid JSON", value); return false;}//include non JSON?
       if(isChromeApp && _local===true){chrome.storage.local.set(set);sessionStorage.setItem(_key,string);}
       else if(isChromeApp && !_local) {chrome.storage.sync.set(set);sessionStorage.setItem(_key,string);}
       else if(_local)                 {localStorage.setItem(_key,string);}
       else                            {sessionStorage.setItem(_key,string);}//endif
+  },
+  key:function(key, _local){
+    var val = this.get(key, _local);
+    return {"set":set};
+
+    function set(k, value){
+      val[k] = value;
+      this.set(key, val, _local);
+    }
   }
 
 };

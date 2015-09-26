@@ -24,11 +24,11 @@ function WorkerCall(option,callback){
             "username"  :profile.username,
             "_id"       :profile._id,
             "screen"    :screen,
-            "SITE_AURA" :sessionStorage.SITE_AURA,
-            "DB_VERSION":sessionStorage.DB_VERSION,
+            "SITE_AURA" :dynamis.get('site').aura,
+            "DB_VERSION":dynamis.get('site').dbVersion,
             "eternalScope":dynamis.get("eternal",true),
-            "DB_NAME"   :sessionStorage.DB_NAME,
-            "SITE_API"  :sessionStorage.SITE_API
+            "DB_NAME"   :dynamis.get('site').name,
+            "SITE_API"  :dynamis.get('site').api
         },option);//ce si vas limiter l'access a ceux qui sont enregistrer seulment.
 
     if(dynamis.get('api').Worker&&(profile) ){
@@ -122,9 +122,10 @@ function checkConnection() {
     iyona.info('Connection type is ' + tmp);
     tmp = !tmp||tmp==='none'?false:tmp;
 
-    var config = dynamis.get("SITE_CONFIG");
-    sessionStorage.SITE_ONLINE = config.isOnline = tmp?true:false;
-    dynamis.set("SITE_CONFIG",config);
+
+    var online = dynamis.get('api').isOnline = tmp?true:false;
+    dynamis.key('site').set('online', online);
+
     return tmp;
 
 }
@@ -320,7 +321,7 @@ function load_script(urls,sync,position,fons){
  * @param {object} notitiaWorker, the worker's object
  */
 function onlineSync(direction){
-    if(sessionStorage.SITE_ONLINE==='true') {
+    if(dynamis.get('site').online=='true') {
         workerCall({'enkele':true,"sync":direction},callback);
         iyona.msg("The Synchronisation in progress...");}
     else{iyona.msg("You are currently offline");}

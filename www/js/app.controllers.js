@@ -5,10 +5,24 @@ angular.module('userManager.controllers', [])
     .controller('groupsCtrl', groupsCtrl)
     .controller('usersCtrl', usersCtrl);
 
-dashCtrl.$inject=['$scope','serveGroup'];
-function dashCtrl($scope, serveGroup) {
+dashCtrl.$inject=['$scope', 'serveGroup', 'angularIDB'];
+function dashCtrl($scope, serveGroup, angularIDB) {
     $scope.settings = {offline:true,gps:true,filesystem:false,notification:false};
-    $scope.model    = {groups:serveGroup.all()};
+
+    serveGroup.all.then(function(val){
+      $scope.model = {groups: val};
+    });
+  var idb = angularIDB.init('config');
+
+  var config = dynamis.get('site');
+
+  config.name= "config";
+  idb.post("config", config, function(result){
+    console.log("Result...", result);
+  })
+    .then(function(result){
+    console.log("Result", result);
+  });
 }
 
 groupCtrl.$inject=['$scope','$stateParams', 'serveGroup'];
